@@ -1,0 +1,70 @@
+%!TEX root = paper.tex
+
+\section{Properties of Lewis weights}
+\label{sec:properties}
+
+Before describing our input-sparsity time algorithm arbitrary $\ell_p$,
+we need to state some properties of Lewis weights.
+Proofs of these properties are deferred to Appendix~\ref{sec:properties-proofs}.
+In order to describe stability, we need to define a generalization of
+the concept of Lewis weights: $\alpha$-almost Lewis weights
+
+\begin{definition}
+For a matrix $\AA$ and norm $\ell_p$, an assignment of weights $\ww$ is \emph{$\alpha$-almost Lewis} if
+\begin{equation*}
+\aa_i^T \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1} \aa_i \approx_{\alpha} \ww^{2/p}_i.
+\end{equation*}
+\end{definition}
+
+The first property we investigate is \emph{stability}.  Recall that switching to $\ell_2$ via Lewis weights
+gives a matrix $\BB = \WWbar^{1/2 - 1/p} \AA$, a reweighted version of $\AA$.  One may then ask how $\BB$ can change if the weights of the rows of $\AA$ change (as by multiplying by constants near 1).  We will give two equivalent definitions of stability, one in terms of $\alpha$-almost Lewis weights and the other in terms of $\BB$:
+
+\begin{definition}
+\label{def:stable}
+For a value of $p > 0$, we will use the following two definitions of $c$-stability equivalently:
+\begin{enumerate}
+\item  For any $\AA'$ obtained by multiplying each row of $\AA$ by a number in
+$[\alpha^{-1}, \alpha]$, the resulting reweighted $\BB'$ can be obtained by multiplying each row of
+$\BB$ by a number in $[\alpha^{-c}, \alpha^c]$.
+\label{def:stable1}
+\item Any set of $\alpha$-almost Lewis weights $\ww$ for $\AA$ satisfy
+\begin{equation*}
+\wwbar_i \approx_{\alpha^c} \ww_i.
+\end{equation*}
+\label{def:stable2}
+\end{enumerate}
+\end{definition}
+
+We start with stability results under multiplicative perturbations of rows.
+Our results are in two regimes: a constant factor one for $p < 4$ and
+a much weaker one for arbitrary $p > 2$.
+
+\begin{lemma}
+\label{lem:fullstable}
+For all $p < 4$, Lewis weights are $\frac{p/2}{1 - |p/2 - 1|}$-stable.
+\end{lemma}
+
+\begin{lemma}
+\label{lem:sqrtstable}
+There exists a function $f(p)$ such that for all $p \geq 2$, $\ell_p$ Lewis weights are $O(f(p) \sqrt{d})$-stable.
+\end{lemma}
+
+Next, we give limits on the multiplicative factors by which that Lewis weights
+can increase when additional rows are added to $\AA$.
+Here, the best property applies for $p \leq 2$:
+
+\begin{lemma}
+\label{lem:fullmonotone}
+For all $p \leq 2$, Lewis weights are \emph{monotonic}: adding an extra row to $\AA$
+to yield $\AA'$ can never make the Lewis weights of existing rows go up.
+\end{lemma}
+
+Unfortunately, this fails to hold for $p > 2$.  However, the weights still can only increase by a bounded amount:
+\begin{lemma}
+\label{lem:weakmonotone}
+For all $p > 2$, if $\AA'$ is $\AA$ with any number of extra rows added,
+\begin{equation*}
+\AA'^T \WWbar'^{1 - 2/p} \AA' \succeq d^{2/p - 1} \AA^T \WWbar^{1 - 2/p} \AA
+\end{equation*}
+and in particular no row in $\AA$ has its weight raised by more than $d^{p/2-1}$.
+\end{lemma}

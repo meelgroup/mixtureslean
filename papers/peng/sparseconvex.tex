@@ -1,0 +1,157 @@
+%!TEX root = paper.tex
+
+\section{An Input-sparsity Time Algorithm for General $\ell_p$}
+\label{sec:sparseconvex}
+
+This section gives an input-sparsity time algorithm for general $\ell_p$.
+In particular, we claim that
+
+\begin{theorem}
+\label{thm:sparseconvex}
+There exists an $f(p)$ and a constant $C$ such that given a matrix $\AA$, $p \in [1, \infty)$,
+and $\theta < 1$, there is an algorithm that computes $n^\theta$-approximate $\ell_p$ Lewis
+weights for $\AA$ in time $O(\frac{p}{\theta} \nnz(\AA) + f(p) d^{p/2 (1 + \theta) + C})$.
+\end{theorem}
+
+Just as with the previous algorithms, this can be combined with sampling by Lewis
+weights to obtain an actual approximation for the matrix.
+
+The core of the algorithm is a fairly simple recursion of the same style as
+those in \cite{CohenLMMPS14:arxiv}.  For simplicity, we will write it in a form
+that assumes the extremely weak condition that $\log n = O(\poly(d))$, although
+even this mild constraint is unnecessary.  The recursive reduction ensures
+that the algorithm from Theorem~\ref{thm:polyslow} only ever needs to run on
+roughly $d^{p/2+1}$-sized samples.  We describe it as passing up a 2-approximation
+of the inverse quadratic form $(\AA^T \WW^{1-2/p} \AA)^{-1}$.
+Its pseudocode is given in Figure~\ref{fig:recurse}.
+
+\begin{figure}[ht]
+
+\begin{algbox}
+
+$ \QQ = \textsc{ApproxLewisForm}(\AA, p, \theta)$
+
+\begin{enumerate}
+\item
+If $n \leq d$, obtain $\QQ$ for $\AA$ (by Theorem~\ref{thm:polyslow}) and return $\QQ$ immediately.
+\item
+Uniformly sample $n / 2$ rows of $\AA$, producing $\widehat \AA$.
+\item
+Let $\widehat \QQ = \textsc{ApproxLewisForm}(\widehat \AA, p, \theta)$
+\item
+Set $\uu_i$ to $n^{\theta / p}$-approximate values of $\aa_i^T \widehat \QQ \aa_i$, computed using
+the Johnson-Lindenstrauss lemma.
+\item
+Nonuniformly sample rows of $\AA$, taking expected $\pp_i = \min(1, f(p) n^{\theta / 2} d^{p/2} \log d \uu_i^{p/2})$
+copies of row $i$ (each scaled down by $\pp_i^{-1/p}$), producing $\AA'$
+\item
+Obtain approximate inverse quadratic form $\QQ$ with Theorem~\ref{thm:polyslow}.
+\item
+Return $\QQ$
+\end{enumerate}
+\end{algbox}
+
+\caption{Recursive procedure for approximating Lewis quadratic form}
+\label{fig:recurse}
+
+\end{figure}
+
+The guarantees of this algorithm can be stated as
+\begin{lemma}
+\label{lem:approxlewisform}
+With high probability, $\textsc{ApproxLewisForm}(\AA, p, \theta)$
+\begin{enumerate}
+\item returns $\QQ$ that's a 2-approximation of the true inverse quadratic
+form $(\AA^T \WW^{1-2/p} \AA)^{-1}$, and
+\label{part:givesapprox}
+\item obtained $\QQ$ by invoking Theorem~\ref{thm:polyslow} on a matrix whose
+expected row count is
+\begin{equation*}
+O\left(f(p) n^{\theta /2} d^{p/2 + 1} \log d\right).
+\end{equation*}
+\label{part:boundedrows}
+\end{enumerate}
+\end{lemma}
+%%\begin{lemma}
+%%\label{lem:givesapprox}
+%%With high probability, $\textsc{ApproxLewisForm}(\AA, p, \theta)$ returns a 2-approximation
+%%of the true inverse quadratic form $(\AA^T \WW^{1-2/p} \AA)^{-1}$.
+%%\end{lemma}
+%%
+%%\begin{lemma}
+%%\label{lem:boundedrows}
+%%The expected number of rows of $\AA'$ is $O(f(p) n^{\theta /2} d^{p/2 + 1} \log d)$.
+%%\end{lemma}
+
+We begin by proving guarantees on the quadratic form proved.
+
+\begin{proof}[Proof of Lemma~\ref{lem:approxlewisform}~Part~\ref{part:givesapprox}]
+By Lemma~\ref{lem:weakmonotone}, the quadratic form of $\AA'$ is not bigger in any
+direction by more than $d^{1-2/p}$ than that of $\AA$. Thus, the sampling probability
+(when less than 1) of row $i$ is at least $f(p) d \log d \wwbar_i$.
+
+Now, define a set of weights $\ww'$ in the sample as appropriate rescalings of the Lewis weights
+of the original rows they are derived from (i.e. a row deriving from original row $i$ is assigned
+weight $\frac{\wwbar_i}{\pp_i}$).  These rows then satisfy
+\begin{equation*}
+{\aa'}_j^T \left( \AA^T \WWbar^{1 - 2/p} \AA \right )^{-1} {\aa'}_j = {\ww'}_j^{2/p}.
+\end{equation*}
+Furthermore, by the ordinary ($\ell_2$) matrix Chernoff bound, with high probability
+\begin{equation*}
+{\AA'}^T {\WW'}^{1 - 2/p} {\AA'} \approx_{1+C / \sqrt{f(p) d}} \AA^T \WWbar^{1-2/p} \AA.
+\end{equation*}
+This implies that
+\begin{equation*}
+{\aa'_j}^T \left( {\AA'}^T {\WW'}^{1 - 2/p} {\AA'} \right )^{-1} \widehat \aa_j \approx_{1+C / \sqrt{f(p) d}} {\ww'}_j^{2/p}.
+\end{equation*}
+That is, the $\ww'$ are $(1+C / \sqrt{f(p) d})$-almost Lewis weights for $\AA'$.  Then by Lemma~\ref{lem:sqrtstable},
+the true Lewis weights for $\AA'$, $\wwbar'$ are within a constant factor (of our choosing) of the $\ww'$
+(with a correct setting of $f(p)$, which should be proportional to the \emph{square} of the $f(p)$
+in Lemma~\ref{lem:sqrtstable}).  We finally see that ${\AA'}^T {\WWbar'}^{1-2/p} \AA'$ is within
+a constant factor of ${\AA'}^T {\WW'}^{1-2/p} {\AA'}$ and thus within a constant factor
+(which we can set to 2) of $\AA^T \WWbar^{1-2/p} \AA$.
+\end{proof}
+
+Next, we prove the bounds on the expected number of rows in the
+intermediate matrix that we produce the final quadratic form.
+This argument is similar to the proof of
+Theorem 1 of~\cite{CohenLMMPS14:arxiv}.
+
+
+\begin{proof}[Proof of Lemma~\ref{lem:approxlewisform}~Part~\ref{part:boundedrows}]
+
+First, we consider a quantity similar to $\uu_i$: $\vv_i = \aa_i^T \widehat \QQ_i \aa_i$, where $\widehat \QQ_i$ is the
+analogous Lewis quadratic form, but defined for $\widehat \AA_i$, $\widehat \AA$ with the row $\aa_i$ concatenated (if it was not already included).
+
+Then $\vv_i^{p/2}$ is just the Lewis weight of $\aa_i$ in $\widehat \AA_i$.  Then analogous to \cite{CohenLMMPS14:arxiv}, we may argue
+that the sum of the $\vv_i^{p/2}$ is the sum of the Lewis weights of the rows of $\widehat \AA$, plus $n/2$ times the average weight
+of unincluded rows.  But the random process picking a subset of $n/2$ rows and then a random unincluded row is the same as picking
+a random subset of $n/2+1$ rows and then a random ``special'' row from that subset.  We thus want to consider picking a random
+subset of $n/2+1$ rows and then taking the Lewis weight of a random row within that subset.  But since the Lewis weights
+for any matrix sum to at most $d$, the expected value of a random $\vv_i^{p/2}$ is at most $\frac{2d}{n+2}$, and the expected
+sum of all the $\vv_i^{p/2}$ (including the rows included in $\widehat \AA$) is $\frac{2n+2}{n+2} d \leq 2d$.
+
+So far, the argument has proceeded identically to \cite{CohenLMMPS14:arxiv}.  Now, however, we have to deal with the fact
+that our weights are not defined based on $\vv_i^{p/2}$, but rather $\uu_i^{p/2}$.  The argument now is that
+the Lewis weights for $\widehat \AA_i$, restricted to the $\widehat \AA$, are in fact $\frac{1}{1-\vv_i^{p/2}}$-almost
+Lewis weights for $\widehat \AA$ (since the quadratic form can only shift by that factor).  Then if $\vv_i^{p/2}$ is smaller
+than $\frac{1}{d^{p/2}}$ (in fact, even just for $\frac{1}{\sqrt{d}}$), Lemma~\ref{lem:sqrtstable} implies that
+the true Lewis weights and true Lewis quadratic form are within $O(1)$ of what they are for $\widehat \AA$, and thus
+that $\uu_i^{p/2}$ is at most a constant multiple of $\vv_i^{p/2}$, and $n^{\theta / 2} d^{p/2} \log d \uu_i^{p/2}$
+is at most $O(n^{\theta / 2} d^{p/2} \log d) \vv_i^{p/2}$.  On the other hand, if $\vv_i^{p/2}$ is larger than
+$\frac{1}{d^{p/2}}$, then 1 (which is also an upper bound on the sampling probability) is only
+$d^{p/2}$ times $\vv_i^{p/2}$.  Thus, the expected sum of the actual sampling probabilities is at most
+$O(n^{\theta / 2} d^{p/2} \log d)$ times larger than the expected sum of $\vv_i^{p/2}$, and is therefore
+$O(n^{\theta /2} d^{p/2 + 1} \log d)$, up to a dependence on $p$.
+\end{proof}
+
+This, combined with a final Johnson-Lindenstrauss stage, satisfies the requirements of Theorem~\ref{thm:sparseconvex}.
+
+It is worth noting that for $p < 2$, we may modify this analysis, replacing the use of Lemma~\ref{lem:weakmonotone} with
+Lemma~\ref{lem:fullmonotone}; for $p < 4$, we may replace Lemma~\ref{lem:sqrtstable} with
+Lemma~\ref{lem:fullstable}.  Using these, we can, for instance, for $p < 2$, run the algorithm with no $d^{p/2}$ factor
+multiplying the weights, so that the samples $\widehat \AA$ are size $O(d \log d)$.  We may further use the iterative scheme
+from Lemma~\ref{lem:computeLewis} (here, you can just compute leverage scores directly and exactly) instead of
+Theorem~\ref{thm:polyslow}.  This can give an alternative input-sparsity time algorithm with a polynomial dependence $d^{\omega}$
+up to polylog factors and tradeoffs with $\theta$, which can have better tradeoffs between the input-sparsity term
+and polynomial term than directly running \ref{lem:computeLewis} with a fast leverage score approximation algorithm.

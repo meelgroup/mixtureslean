@@ -1,0 +1,15 @@
+name = "domain-reduction"
+defaultTargets = ["DomainReduction"]
+testDriver = ""
+
+# Formalization of "Total Variation Distance Estimation through Domain
+# Reduction".  The reusable half of the development (weighted point sets, the
+# ℓ¹ evaluation functional, subspace embeddings, tensor products of coresets,
+# multiplicative-error algebra) lives in `arlib`; this package holds the
+# paper-specific models and the capstone theorems.
+[[require]]
+name = "arlib"
+path = "../arlib"
+
+[[lean_lib]]
+name = "DomainReduction"

@@ -1,0 +1,169 @@
+%!TEX root = paper.tex
+
+\section{An Elementary Proof of $\ell_1$ Matrix Concentration Bound}
+\label{sec:concentration}
+
+In this section, we give an elementary proof of the concentration bound
+described in Theorem~\ref{thm:l1chernoff}.
+
+\lonechernoff*
+
+By Lemma~\ref{lem:momentreduct}, it suffices to prove that there exists a $C_r$ such that
+if \emph{every} Lewis weight is at most $C_r \epsilon^2 / \log(n / \delta)$, there exists an $l$ such that
+\begin{equation*}
+\expec{\sigma}{\left (\max_{\norm{\AA \xx}_1 = 1} \left | \sum_i \sigma_i |\aa_i^T \xx_i| \right | \right )^l} \leq \epsilon^l \delta
+\end{equation*}
+where the $\sigma_i$ are independent Rademacher variables.
+
+
+We begin by invoking the comparison theorem for Radamacher processes,
+as stated in Proposition 1 of~\cite{LedouxT89}.
+
+\begin{lemma}
+\label{lem:comparison}
+For any positive, monotonic function $f$ we have:
+\begin{equation*}
+\expct{\sigma}{ f \left( \max_{\xx, \norm{\AA \xx}_1 = 1 } \abs{\sum_i \sigma_i \abs{\aa_{i}^T \xx }} \right)}
+\leq 2 \expct{\sigma}{  f \left( \max_{\xx, \norm{\AA \xx}_1 = 1 } \sum_i \sigma_i \aa_{i}^T \xx \right) }.
+\end{equation*}
+\end{lemma}
+
+
+It remains to bound this new random process (with the absolute values removed).
+Here note that duality of norms gives that
+\begin{equation*}
+\max_{\norm{\yy}_{1} \leq 1} \xx^T \yy
+= \norm{\xx}_{\infty}.
+\end{equation*}
+
+\begin{lemma}
+\label{lem:lewlinf}
+
+\begin{equation*}
+\left( \max_{\xx, \norm{\AA \xx}_1 = 1} \sum_i \sigma_i \aa_i^T \xx \right)^{l}
+\leq \sum_i \left | \sum_j \sigma_j
+\wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right |^l .
+\end{equation*}
+
+\end{lemma}
+
+\begin{proof}
+
+Consider the expression
+\begin{equation*}
+\max_{\xx, \norm{\AA \xx}_1 = 1 } \sum_i \sigma_i \aa_i^T \xx.
+\end{equation*}
+Direct algebraic manipulation gives that it is equivalent to
+\begin{equation*}
+= \max_{\xx, \norm{ \AA \xx}_1 \leq 1} \ssigma^T \AA \xx
+\end{equation*}
+with $\ssigma$ representing a vector of all the $\sigma_i$.
+
+Now, let $\PPi = \AA ( \AA^T \WWbar^{-1} \AA )^{-1} \AA^T \WWbar^{-1}$.  $\PPi$ is a projection matrix to
+the column space of $\AA$, and in particular $\PPi \AA = \AA$ (this can be shown simply by
+multiplying it out and cancelling $\AA^T \WWbar^{-1} \AA$ with its inverse).  Note that $\PPi$ is
+specifically the \emph{orthogonal} projection to this subspace with respect to the
+$\wwbar^{-1}$-weighted inner product: the natural inner product induced by the Lewis weights.
+
+Thus we have $\PPi \AA \xx = \AA \xx$, so the quantity is equal to
+\begin{equation*}
+\max_{\xx, \norm{ \AA \xx}_1 \leq 1} \ssigma^T \PPi \AA \xx.
+\end{equation*}
+This is upper bounded by
+\begin{equation*}
+\max_{\yy, \norm{\yy}_1 \leq 1} \ssigma^T \PPi \yy.
+\end{equation*}
+as any $\AA \xx$ can be plugged in as $\yy$.  But by duality of norms, as mentioned above,
+that quantity is at most
+\begin{equation*}
+\norm{\PPi^T \ssigma}_\infty = \max_i \left | \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right |.
+\end{equation*}
+
+
+The $l$\textsuperscript{th} power of this max is at most the sum of the
+$l$\textsuperscript{th} powers of the entries.
+This gives
+\begin{equation*}
+\left( \max_i \left | \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right | \right)^l
+\leq \sum_i \left | \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right |^{l}.
+\end{equation*}
+\end{proof}
+
+To bound these terms, we will use the Khintchine inequality and the definition of Lewis weights.
+
+\begin{lemma}[Khintchine]
+Let $\sigma_i$ be independent Radamacher random variables.
+Let $1 \leq l < \infty$  and let $\xx_i \in \Re$. Then there exists an absolute constant $C$ such that
+\begin{equation*}
+\expct{\sigma}{ \left | \sum_{i} \sigma_i \xx_i \right |^{l}}
+\leq \left(Cl \sum_{i} \left| x_i \right|^2 \right)^{l/2}.
+\end{equation*}
+\end{lemma}
+
+\begin{lemma}
+\label{lem:momBound}
+There exists an absolute constant $C$ such that, for any $\AA$ having all Lewis weights bounded by $U$, and $l \geq 1$
+\begin{equation*}
+\expec{\sigma}{\left (\max_{\norm{\AA \xx}_1 = 1} \left | \sum_i \sigma_i |\aa_i^T \xx_i| \right | \right )^l} \leq 2n (Clu)^{l/2}.
+\end{equation*}
+\end{lemma}
+
+\begin{proof}
+We apply Khintchine's inequality to the terms
+$\expec{\sigma}{\left | \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right |^{l}}$,
+which gives an upper bound for each term of
+\begin{equation*}
+\left ( Cl \sum_j ( \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j )^2 \right )^{l/2}.
+\end{equation*}
+
+Now, we apply our Lewis weight upper bound to show that
+\begin{equation*}
+\sum_j ( \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j )^2 \leq U \sum_j ( \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \wwbar_j^{-1/2} )^2.
+\end{equation*}
+
+We may then rewrite that expression as
+\begin{equation*}
+U \wwbar_i^{-2} \sum_j  \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \wwbar_j^{-1} \aa_j^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_i.
+\end{equation*}
+
+Only the middle, $\aa_j \wwbar_j^{-1} \aa_j$ depends on $j$, so the whole sum is
+\begin{equation*}
+U \wwbar_i^{-2} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \left ( \sum_j \aa_j \wwbar_j^{-1} \aa_j^T \right ) ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_i.
+\end{equation*}
+Since $\sum_j \aa_j \wwbar_j^{-1} \aa_j^T = \AA^T \WWbar^{-1} \AA$, this is just
+\begin{equation*}
+U \wwbar^{-2} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_i = U \wwbar^{-2} \wwbar^2
+\end{equation*}
+or just $U$.  Note that the last equation used the definition of Lewis weights.  Thus, for all $i$,
+\begin{equation*}
+\expec{\sigma}{\left( \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right )^{l}}
+\leq (ClU)^{l/2},
+\end{equation*}
+so their sum
+\begin{equation*}
+\expec{\sigma}{\sum_i \left( \sum_j \sigma_j \wwbar_i^{-1} \aa_i^T ( \AA^T \WWbar^{-1} \AA )^{-1} \aa_j \right )^{l}} \leq n (ClU)^{l/2}.
+\end{equation*}
+Combining this with Lemma~\ref{lem:comparison} and Lemma~\ref{lem:lewlinf} gives the desired bound.
+\end{proof}
+
+We can now prove the main theorem.
+
+\begin{proof}[Proof of Theorem~\ref{thm:l1chernoff}]
+First, we show that there exists an absolute constant $C$ such that with any $\AA$ having each Lewis weight
+bounded by $\frac{C_r \epsilon^2}{\log(2n/\delta)}$, there exists an $l$ such that,
+\begin{equation*}
+\expec{\sigma}{\left (\max_{\norm{\AA \xx}_1 = 1} \left | \sum_i \sigma_i |\aa_i^T \xx_i| \right | \right )^l} \leq \epsilon^l \delta.
+\end{equation*}
+
+To obtain this, we simply plug $l = \log(2n/\delta)$ and $U = \frac{1}{Ce^2} \epsilon^2 / \log(2n / \delta)$ into
+Lemma~\ref{lem:momBound}, giving $(ClU)^{1/2} = \frac{\epsilon}{e}$,
+and $(ClU)^{l/2} = \epsilon^l \frac{\delta}{2n}$.
+
+Plugging this into Lemma~\ref{lem:momentreduct} and applying Markov's inequality gives Theorem~\ref{thm:l1chernoff}.
+\end{proof}
+
+We remark that Talagrand used a slightly different method to go from bounds for this Rademacher process to
+the existence of good subspace approximations.  Essentially, he pointed out that this process shows that
+$\AA$ with large $n$ are well-approximated by ones with about $\frac{3}{4} n$ rows, with the approximation
+quality improving as $n$ gets larger.  Iteratively replacing $\AA$ with a smaller approximation eventually leaves
+one of size $O(d \log d / \epsilon^2)$ (in Talagrand's case; with our approach we would again get $d \log(d/\epsilon) / \epsilon^2$).

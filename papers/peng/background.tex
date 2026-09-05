@@ -1,0 +1,194 @@
+%!TEX root = paper.tex
+
+\section{Background and Overview}
+\label{sec:overview}
+
+The paper deals extensively with vectors and matrices.
+The $\ell_p$-norm of a vector $\xx \in \Re^{d}$ is defined as
+\begin{equation*}
+\norm{\xx}_p = \left( \sum_{i = 1}^{d} \left|\xx_i\right|^{p} \right)^{1/p}. 
+\end{equation*}
+For a matrix $\AA$, we will use $n$ and $d$ to denote its number of
+rows and columns respectively, and $\aa_i$ to denote the vector
+corresponding to the $i\textsuperscript{th}$ row of $\AA$.
+Note that $\aa_i$ is a {\em column} vector.
+The $\ell_p$-norm of a vector $\xx$ w.r.t. $\AA$ can then be written as
+\begin{equation*}
+\norm{\AA \xx}_p = \left( \sum_{i = 1}^{n} \left| \aa_i^T \xx \right|^{p} \right)^{1/p}.
+\end{equation*}
+We will also assume our matrices are full rank, since otherwise we can
+either project onto its rank space, or use pseudo-inverses accordingly.
+
+Most of our analyses revolve around multiplicative errors.
+Here we follow the approximation notation from~\cite{CohenLMMPS14:arxiv}.
+For a  parameter $\alpha \geq 1$, we say two quantities $x$ and $y$ satisfy
+$x \approx_{\alpha} y$ if
+\begin{equation*}
+\frac{1}{\alpha} x \leq y \leq \alpha x.
+\end{equation*}
+Note that if $x \approx_{\alpha} y$, then for any power $p$ we have
+$x^{p} \approx_{\alpha^{|p|}} y^{p}$.
+
+A cruciual definition in $\ell_2$ row sampling and matrix concentration bounds is
+statistical leverage scores.
+The statistical leverage score of a row $\aa_i$ is
+\begin{equation*}
+\ttau_{i}\left(\AA\right)
+\defeq \aa_i^T \left( \AA^T \AA \right)^{-1} \aa_i
+= \norm{\left( \AA^T \AA \right)^{-1/2} \aa_i}_2^2.
+\end{equation*}
+It can be viewed as the squared norm of the $i\textsuperscript{th}$ row after the
+statistical whitening transform (see e.g.. Hyvarinen et al.~\cite{HyvarinenO00}).
+Equivalently, it is also often defined as the squared row norm of the matrix of left singular vectors
+of $\AA$.
+The following facts about statistical leverage scores underpin their role
+in $\ell_2$ row sampling.
+\begin{fact}
+\label{fact:tau}
+\begin{enumerate}
+\item \label{item:foster} (Foster's theorem~\cite{Foster53}) $\sum_{i = 1}^{n} \ttau_{i} (\AA) \leq d$,
+\item \label{item:upper1} $\ttau_{i}(\AA) \leq 1$.
+\item \label{item:l2concentration} ($\ell_2$ Matrix Concentration Bound)
+There exists an absolute constant $C_s$ such that for any matrix $\AA$ and any
+set of sampling values $\pp_i$ satisfying
+\begin{equation*}
+\pp_i \geq C_s \ttau_{i} \left( \AA \right) \log{d} \epsilon^{-2},
+\end{equation*}
+if we generate a matrix $\SS$ with $N = \sum \pp_i$ rows, each chosen
+independently as the $i$\textsuperscript{th} basis vector,
+times $\frac{1}{\sqrt{\pp_i}}$, with probability $\frac{\pp_i}{N}$
+then with high probability we will have
+$\norm{\SS \AA \xx}_2 \approx_{1 + \epsilon} \norm{\AA \xx}_2$ for all vectors $\xx$.
+\end{enumerate}
+\end{fact}
+Combining part~\ref{item:foster} and part~\ref{item:l2concentration} immediately implies that replacing
+$\AA$ with $O(d \log d / \epsilon^2)$ reweighted row samples from $\AA$ can give a $(1+\epsilon)$ approximation.
+
+$\ell_p$ spaces are more complicated and lack many useful properties of $\ell_2$.
+The Lewis weight approach can be seen as a particular way to tap into the niceness of $\ell_2$
+by defining, for any matrix $\AA$, a corresponding matrix $\BB$ so that $\norm{\AA \xx}_p$
+is in some sense related to $\norm{\BB x}_2$.  One conceivable notion of relatedness would be
+to simply minimize the maximum distortion between the norms.  This would define $\BB$ based on
+the John ellipsoid for the convex body $\norm{\AA \xx}_p \leq 1$; this is essentially the technique
+used in \cite{DasguptaDHKM09} and follow-up works.  However, it does not lead to tight bounds, and
+the Lewis approach is different (although Section~\ref{sec:convex} reveals a similarity).
+
+The most naive approach would seem to be to simply set $\BB = \AA$.  Here, however, one
+sees that $\BB$ cannot properly capture $\AA$, since $\norm{\BB x}_2$ is not invariant under
+``change of density.''  For instance, one may ``split'' a row $\aa_i$ in $\AA$ into $k$ pieces,
+each equal to $k^{-1/p} \aa_i$, and $\norm{\AA \xx}_p$ will remain unchanged.
+$\norm{\AA \xx}_2$, though, will change, and could be arbitrarily distorted by subdividing different
+rows different amounts.
+
+Instead, we adapt this naive approach by using a different ``density.''  We effectively assume
+that a given row $\aa_i$ really represents $\ww_i$ rows, each equal to $\ww_i^{-1/p} \aa_i$.
+$\ww_i$ may not be an integer, but this does not really matter; they could be viewed as
+weights in a weighted $\ell_p$ norm rather than a number of copies.  When switching to $\ell_2$,
+the original row $i$ of $\AA$ would still correspond to $\ww_i$ rows equal to $\ww_i^{-1/p} \aa_i$, but
+this now has the same effect as one row equal to $\ww_i^{1/2 - 1/p} \aa_i$, rather than simply $\aa_i$
+itself.  Putting this together, we will define $\BB = \WW^{1/2 - 1/p} \AA$.
+
+This still leaves the question of how to actually choose the weights $\ww_i$ (the
+specific change of density).  Intuitively, we want the split up rows, $\ww_i^{-1/p} \aa_i$
+to be normalized in some way.  Lewis's change of density gives a simple and natural
+notion of this: each of these normalized rows should have leverage score 1
+(defined in terms of a $\ww_i$-weighted $\ell_2$ norm), or, more explicitly,
+the $i$\textsuperscript{th} row of $\BB$ should end up with leverage score $\ww_i$.  Note that
+this is a somewhat circular characterization: $\ww_i$ must match the leverage
+scores of $\BB$, but $\BB$ itself depends on $\ww_i$.  The Gram matrix
+of $\BB$ is $\AA^T \WW^{1 - 2/p} \AA$.  Writing this all in terms of the
+original matrix $\AA$ gives:
+\begin{definition}
+\label{def:lewis}
+For a matrix $\AA$ and norm $p$, the $\ell_p$ Lewis weights $\wwbar$ are the unique
+weights such that for each row $i$ we have
+\begin{equation*}
+ \wwbar_i = \ttau_{i} \left( \WWbar^{1/2 - 1/p} \AA \right).
+\end{equation*}
+ or equivalently
+\begin{equation*}
+\aa_i^T \left( \AA^T \WWbar^{1 - 2/p} \AA \right)^{-1} \aa_i = \wwbar^{2/p}_i.
+\end{equation*}
+\end{definition}
+We will make extensive use of the second formulation
+since it groups the $\wwbar_i$ values on one side.
+It also involves measuring the operator $\AA^T \WWbar^{1 - 2/p} \AA$ against a fixed
+vector $\aa_i$, and therefore allows us to incorporate bounds on the operator.
+These definitions have analogs in recent speedups of interior point methods
+by Lee and Sidford~\cite{LeeS14}; for example, the requirement on the weight function
+in the LP algorithm of~\cite{LeeS13a:arxiv}.
+
+Note that for the case where $p = 2$, $\WWbar^{1/2 - 1/p}$ is the identity matrix,
+so the Lewis weights are just the leverage scores.  In the case of general $p$,
+it is not immediately clear that the Lewis weights must actually exist or be unique
+because of the apparently circularity; existence and uniqueness was first established
+by Lewis in~\cite{lewis}.  This paper also includes proofs of the existence and
+uniqueness of Lewis weights, which follow directly from the arguments used to
+prove our algorithms.  The first is in Section~\ref{sec:compute} (Corollary~\ref{cor:itlewis}
+and applies to $p < 4$.  The second is in Section~\ref{sec:convex} (Corollary~\ref{cor:conlewis})
+and gives a proof of existence for all $p$ and uniquness for $p \geq 2$ (so together, these
+proofs give existence and uniqueness for all $p$); the resulting proof from that section
+is a restatement of traditional proofs.
+
+In Section~\ref{sec:concentration} (combined with Section~\ref{sec:ellp}),
+we will prove the following concentration bound,
+which is a variant of Proposition 2 from~\cite{Talagrand90}.
+\begin{restatable}[$\ell_1$ Matrix Concentration Bound]{theorem}{lonechernoff}
+\label{thm:l1chernoff}
+There is an absolute constant $C_s$ such that given a matrix $\AA$
+with $\ell_1$ Lewis weights $\wwbar$, for any set of sampling values $\pp_i$,
+$\sum_i \pp_i = N$,
+\begin{equation*}
+\pp_i \geq C_s \wwbar_i \log(N) \epsilon^{-2},
+\end{equation*}
+if we generate a matrix $\SS$ with $N$ rows, each chosen
+independently as the $i$\textsuperscript{th} standard basis vector,
+times $\frac{1}{\pp_i}$, with probability $\frac{\pp_i}{N}$,
+then with high probability we have
+\begin{equation*}
+\norm{\SS \AA \xx}_1
+\approx_{1 + \epsilon} \norm{\AA \xx}_1
+\end{equation*}
+for all vectors $\xx \in \Re^{d}$.  In particular, with constant factor
+approximations to the Lewis weights, $O(d \log(d/\epsilon) \epsilon^{-2})$
+row samples suffices.
+\end{restatable}
+
+The bound on sample count also follows from Fact~\ref{fact:tau}.
+As a result, it remains to compute approximate $\ell_p$ Lewis weights.
+We present a novel, but extremely simple, iterative scheme that can do this for all $p < 4$.
+We repeatedly perform
+\begin{equation*}
+\ww'_i \leftarrow \left( \aa_i^T \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1} \aa_i \right)^{p/2}
+\end{equation*}
+using a possibly approximate algorithm for computing statistical leverage scores.
+This routine resembles the use of $\ell_2$-regression to solve $\ell_1$
+regression through repeated reweighting~\cite{ChinMMP13}.
+Its convergence also mimics the reduction in row counts in the iterative $\ell_p$
+row sampling algorithm by Li et al.~\cite{LiMP13}.
+We will prove the following Lemma regarding this procedure in Section~\ref{sec:compute}
+\begin{lemma}
+\label{lem:computeLewis}
+For any fixed $p < 4$, given a routine \textsc{ApproxLeverageScores} for computing
+$\beta$-approximate statistical leverage scores of rows of matrices of the form $\WW \AA$ for
+$\beta = n^{\Omega(\theta)}$, we can compute a $n^{\theta}$ approximation to
+$\ell_p$-Lewis weights for $\AA$ with $O(\log(\theta))$ calls to \textsc{ApproxLeverageScores}. 
+\end{lemma}
+
+Combining this Lemma with Theorem~\ref{thm:l1chernoff} or \cite{Talagrand90}, using $\theta$ proportional
+to $\frac{1}{\log n}$, gives an algorithm satisfying the conditions of Theorem~\ref{thm:main}.
+We may use standard techniques, as described, for instance, in \cite{CohenLMMPS14:arxiv}, to
+get an input sparsity time algorithm as claimed in the introduction.
+The idea is to run in two phases, first using a constant $\theta$, then resparsifying with $\theta$
+proportional to $\frac{1}{\log n}$ (getting a $d^{\theta}$ dependence, rather than just $n^\theta$,
+turns out to be automatic, since if $n > d^4$, the $\nnz$ term will dominate anyway).
+The same process can be used for any $p \leq 4$, with sparsifier
+sizes as stated in Section~\ref{sec:ellp}; however, due to the size of the intermediate sparsifier,
+the polynomial dependence will be $d^{\max(\omega, p/2+1) + \theta}$.
+
+It is worth noting that the technique in Section~\ref{sec:sparseconvex}, can also be be combined with
+these methods (with Lemma~\ref{lem:computeLewis} replacing the convex optimization technique of
+Theorem~\ref{thm:polyslow} from Section~\ref{sec:convex}) to give input sparsity time algorithms.
+The arguments in Section~\ref{sec:sparseconvex} allow better parameters in the ranges $p \leq 2$
+and $p \leq 4$ (this is discussed in more detail there), and this algorithm can support a
+slightly better tradeoff between the input sparsity cost and the polynomial term.

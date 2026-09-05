@@ -1,0 +1,164 @@
+\section{Iteratively Computing Approximate Lewis Weights}
+\label{sec:compute}
+
+Pseudocode of our algorithm is given in Figure~\ref{fig:iteration}.
+
+\begin{figure}[ht]
+
+\begin{algbox}
+
+$\ww = \textsc{LewisIterate}(\AA, p, \beta, \ww)$
+
+\begin{enumerate}
+	\item For $i = 1 \ldots n$
+	\begin{enumerate}
+		\item Let $\tilde{\ttau_i} \approx_{\beta} \ttau_{i} \left( \WW^{1/2 - 1/p} \AA \right)$ be a $\beta$-approximation of the statistical leverage score of row $i$ in $\WW^{1/2 - 1/p} \AA$.
+		\item Set $\wwhat_i \leftarrow \left( \ww_i^{2/p - 1} \tilde{\ttau}_i \right)^{p/2} \approx_{\beta^{p/2}} (\aa_i^T \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1} \aa_i)^{p/2}$.
+	\end{enumerate}
+	\item Return $\wwhat$.
+\end{enumerate}
+
+$\ww =\textsc{ApproxLewisWeights}(\AA, p, \beta, T)$
+
+\begin{enumerate}
+	\item Initialize $\ww_i  = 1$
+	\item For $t = 1 \ldots T$
+	\begin{enumerate}
+		\item Set $\ww \leftarrow \textsc{LewisIterate}(\AA, p, \beta, \ww)$.
+	\end{enumerate}
+	\item Return $\ww$.
+\end{enumerate}
+\end{algbox}
+
+\caption{Iterative Algorithm for Computing Lewis Weights}
+\label{fig:iteration}
+
+\end{figure}
+
+In our proof, we make use of the generalization of approximations
+ to the matrix setting via the Loewner partial ordering.
+For two symmetric matrices $\PP$ and $\QQ$, we have $\PP \preceq \QQ$
+if $\PP - \QQ$  is positive semi-definite.
+We will then use $\PP \approx_{\alpha} \QQ$ to denote
+\begin{equation*}
+\frac{1}{\alpha} \PP \preceq \QQ \preceq \alpha \PP. 
+\end{equation*}
+Note that this is equivalent to $\xx^T \PP \xx \approx_{\alpha} \xx^T \QQ \xx$ for
+all vectors $\xx$.
+Two facts of particular importance for spectral approximation of matrices
+are its composition and inversion.
+\begin{fact}
+\label{fact:operatorApprox}
+\begin{enumerate}
+\item If $\PP \approx_{\alpha} \QQ$, then for any matrix $\AA$, we also have
+$\AA^T \PP \AA \approx_{\alpha} \AA^T \QQ \AA$.
+\item If $\PP \approx_{\alpha} \QQ$, then $\PP^{-1} \approx_{\alpha} \QQ^{-1}$.
+\end{enumerate}
+\end{fact}
+
+First, we show that (for $p < 4$) $\textsc{LewisIterate}(\AA, p, 1, _)$ acts as a
+contraction mapping with respect to the $\ell_\infty$ distance of the $\log$ weights:
+\begin{lemma}
+\label{lem:contraction}
+Given $\AA$, $p$, and weight sets $\vv$ and $\ww$ such that $\vv \approx_{\alpha} \ww$,
+\begin{equation*}
+\textsc{LewisIterate}(\AA, p, 1, \vv) \approx_{\alpha^{|p/2 - 1|}} \textsc{LewisIterate}(\AA, p, 1, \ww).
+\end{equation*}
+\end{lemma}
+\begin{proof}
+Since $\vv \approx_{\alpha} \ww$, we have, in the matrix setting
+\begin{equation*}
+\VV^{1 - 2/p} \approx_{\alpha^{|1 - 2/p|}} \WW^{1 - 2/p}.
+\end{equation*}
+Applying both items of Fact~\ref{fact:operatorApprox} we then have
+\begin{equation*}
+\left( \AA^T \VV^{1 - 2/p} \AA \right)^{-1} \approx_{\alpha^{|1-2/p|}} \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1}.
+\end{equation*}
+Then applying the definition of operator approximation, we have, for all $i$,
+\begin{equation*}
+\aa_i^T \left( \AA^T \VV^{1 - 2/p} \AA \right)^{-1} \aa_i \approx_{\alpha^{|1-2/p|}} \aa_i^T \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1} \aa_i.
+\end{equation*}
+Taking the $p/2$ power of both sides gives the desired result.
+\end{proof}
+An immediate corollary of this lemma is
+\begin{corollary}
+\label{cor:convergence}
+Given $\AA$ with $\ell_p$ Lewis weights $\wwbar$ and a set of weights $\ww$ with $\ww \approx_{\alpha} \wwbar$,
+\begin{equation*}
+\textsc{LewisIterate}(\AA, p, \beta, \ww) \approx_{\beta^{p/2} \alpha^{|p/2 - 1|}} \wwbar.
+\end{equation*}
+\end{corollary}
+\begin{proof}
+This follows from applying Lemma~\ref{lem:contraction} to $\ww$ and $\wwbar$, noting that
+$\textsc{LewisIterate}(\AA, p, \beta, \ww) \approx_{\beta^{p/2}} \textsc{LewisIterate}(\AA, p, 1, \ww)$ and that
+$\textsc{LewisIterate}(\AA, p, 1, \wwbar) = \wwbar$.
+\end{proof}
+
+Interestingly, another corollary is that for $p < 4$, the Lewis weights exist and are unique:
+\begin{corollary}
+\label{cor:itlewis}
+For all $p < 4$, there exists a unique assignment of weights $\ww$ that are a fixed point of
+$\textsc{LewisIterate}(\AA, p, 1, _)$, or equivalently that satisfy Definition~\ref{def:lewis}.
+\end{corollary}
+\begin{proof}
+This is just the Banach fixed point theorem applied to $\textsc{LewisIterate}(\AA, p, 1, _)$:
+whenever $p < 4$, $|1-2/p| < 1$, so the iteration is a contraction mapping and has a unique
+fixed point.
+\end{proof}
+
+We can also show that after one step $\ww$ is already polynomially close to $\wwbar$:
+\begin{lemma}
+\label{lem:initialization}
+After $t = 1$ in $\textsc{ApproxLewisWeights}(\AA, p, \beta, T)$, $\ww_i \approx_{\beta^{p/2} n^{|p/2 - 1|}} \wwbar_i$.
+\end{lemma}
+\begin{proof}
+We first note that we may assume, without loss of generality, that $\AA^T \WWbar^{1 - 2/p} \AA = \II$.
+This is because both the definition of Lewis weights and the algorithms are invariant under replacing
+$\AA$ with $\AA \RR$, with $\RR$ any full-rank $d$ by $d$ matrix.
+
+Then we claim that
+\begin{equation*}
+\AA^T \AA \approx_{n^{|1 - 2/p|}} I.
+\end{equation*}
+
+First, we let $\bb_i = \wwbar_i^{1/2 - 1/p} \aa_i$, so that $\aa_i = \wwbar_i^{1/p - 1/2} \bb_i$.
+We note that by the definition of leverage score and Lewis weight, $\norm{\bb_i}_2 = \ww_i$.
+
+Now, consider any unit vector $\uu$.  We have
+\begin{align*}
+1 &= \uu^T \uu \\
+&= \uu^T \BB^T \BB \uu \\
+&= \sum_i (\uu_i^T \bb_i)^2 \\
+&= \sum_i \wwbar_i (\wwbar_i^{-1} (\uu_i^T \bb_i)^2).
+\end{align*}
+
+On the other hand, we have
+\begin{align*}
+\uu^T \AA^T \AA \uu &= \sum_i \wwbar_i^{2/p - 1} (\uu_i^T \bb_i)^2 \\
+&= \sum_i \wwbar_i^{2/p} (\wwbar_i^{-1} (\uu_i^T \bb_i)^2).
+\end{align*}
+
+Furthermore, $\sum_i \wwbar_i^{-1} (\uu_i^T \bb_i)^2 \leq n$, since each term is
+$\leq 1$ (as, by Cauchy-Schwarz, $(\uu_i^T \bb_i)^2 \leq \norm{\bb_i}_2^2 = \wwbar_i$).
+
+Then the worst-case distortion would be if $\sum_i \wwbar_i^{-1} (\uu_i^T \bb_i)^2 = n$ and all $\wwbar_i$ are $\frac{1}{n}$.  In
+that case, the distortion is $n^{|1 - 2/p|}$, as desired.
+
+Finally, the $\ww$ after one step are
+\begin{equation*}
+\ww_i \approx_{\beta^{p/2}} (\aa_i^T (\AA^T \AA)^{-1} \aa_i)^{p/2}.
+\end{equation*}
+These are then at most $\beta^{p/2} n^{p/2 |1-2/p|} = \beta^{p/2} n^{|p/2 - 1|}$ off from $\wwbar_i$.
+\end{proof}
+
+Combining this initial condition with the convergence result allows us to bound
+the total number of steps, giving a proof of Theorem~\ref{thm:main}.
+
+\begin{proof}[Proof of Lemma~\ref{lem:computeLewis}]
+The total multiplicative contribution of the blowups from $\beta$ is at most $\beta^{\frac{p/2}{1 - |p/2 - 1|}}$.
+The contribution from the starting error is at most $n^{|p/2 - 1|^T}$.
+
+Then if $\beta \leq n^{\theta \frac{1 - |p/2 - 1|}{p}}$ and $T \geq \frac{\log(2 / \theta)}{1 - |p/2 - 1|}$,
+each provides at most $n^{\theta / 2}$ error, so the result is an $n^{\theta}$-approximation.
+\end{proof}
+

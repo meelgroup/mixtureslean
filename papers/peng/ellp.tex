@@ -1,0 +1,184 @@
+%!TEX root = paper.tex
+
+\section{$\ell_p$ Matrix Concentration Bounds}
+\label{sec:ellp}
+
+In this section we sketch proofs of the various matrix concentration
+bounds that we utilize in our algorithms.
+
+We get the core results from several earlier papers on $\ell_p$ approximation bounds.
+To understand how these papers match our use of them, one should realize that they are
+written in the language of approximate isomorphisms between Banach spaces.  Effectively,
+they attempt to embed the column span of our matrix $\AA$ as a subspace of $L_p$.
+
+\begin{theorem}
+\label{thm:ellpsample}
+Given an $n$ by $d$ matrix $\AA$
+with $\ell_p$ Lewis weights $\wwbar$, for any set of sampling values $\pp_i$,
+$\sum_i \pp_i = N$,
+\begin{equation*}
+\pp_i \geq f(d, N, p, \epsilon, \delta) \wwbar_i,
+\end{equation*}
+if we generate a matrix $\SS$ with $N$ rows, each chosen
+independently as the $i$th standard basis vector,
+times $\frac{1}{\pp_i^{1/p}}$, with probability $\frac{\pp_i}{N}$,
+then with probability at least $1-\delta$ we have
+\begin{equation*}
+\norm{\SS \AA \xx}_1
+\approx_{1 + \epsilon} \norm{\AA \xx}_1
+\end{equation*}
+for all vectors $\xx \in \Re^{d}$.
+
+Valid asymptotic bounds on $d f(d, N, p, \epsilon, \delta)$ (i.e. the resulting row count,
+since Lewis weights sum to $d$; here, the resulting row count itself
+is plugged in as $N$) are given in the table below:
+
+\begin{tabular}{| l | l | l |}
+\hline
+$p$ & $\delta$ & Sufficient row count \\ \hline
+$p = 1$ & $\frac{1}{d^C}$ & $d \log(d / \epsilon) / \epsilon^2$ \\ \hline
+$p = 1$ & $\frac{1}{C}$ & $d \log d / \epsilon^2$ \\ \hline
+$1 < p < 2$ & $\frac{1}{C}$ & $d \log(d / \epsilon) \log(\log d / \epsilon)^2 / \epsilon^2$ \\ \hline
+$p > 2$ & $\frac{1}{d^C}$ & $d^{p / 2} \log d \log(1 / \epsilon) / \epsilon^5$ \\ \hline
+\end{tabular}
+\end{theorem}
+
+The last entry was proved directly in~\cite{BourgainLM89}.  For the others (the $p < 2$ cases),
+these statements (that this sampling procedure is valid) are not proved directly.  Rather,
+they look at the case where the Lewis weights are \emph{uniformly} small,
+examining a random process choosing $\sigma_i$ independent Rademacher variables
+(i.e. independently $\pm 1$ with probability $\frac{1}{2}$ each) to give
+\begin{equation*}
+\max_{\norm{\AA \xx}_p = 1} \left | \sum_i \sigma_i |\aa_i^T \xx_i|^p \right |.
+\end{equation*}
+It is worth noting that this is equivalent to taking the error of of sampling
+about half the rows by unbiased coin flips.
+
+We may, specifically, get the following statements from the existing results.
+
+The following was shown in~\cite{Talagrand90}
+\begin{lemma}[\cite{Talagrand90}]
+\label{lem:talagrandL1}
+There exists a constant $C$ such that if every row of $\AA$ has
+Lewis weight at most $C \frac{\epsilon^2}{\log d}$, we have
+\begin{equation*}
+\expec{\sigma}{\max_{\norm{\AA \xx}_1 = 1}
+\left | \sum_i \sigma_i \left|\aa_i^T \xx \right| \right|} \leq \epsilon.
+\end{equation*}
+\end{lemma}
+
+\begin{proof}
+This is implicit in \cite{Talagrand90}.  First, the proof of Proposition 1 in that paper includes a proof that this quantity is dominated by a constant times
+\begin{equation*}
+\expec{g}{\max_{\norm{\AA \xx}_1 = 1}
+\left | \sum_i g_i ( \aa_i^T \xx ) \right |},
+\end{equation*}
+where the $g_i$ are independent standard Gaussian variables.  Note that this differs in two ways: the Rademacher variables are replaced with Gaussians, and
+the inner absolute values have been removed (so that it is now just the max of a linear function). 
+The first step is done via the comparison lemma for Radamacher processes,
+which we state formally at the start of Section~\ref{sec:concentration}.
+The second step is by the contraction principle, which in turn relies on the
+convexity of the quantity being bounded.
+
+This latter quantity is then bounded, under this assumption of bounded Lewis weights,
+in the proof of Proposition 2.
+The probability measure $\nu$, as defined on the bottom of page 366
+corresponds to the probability distribution of rows proportional to
+their Lewis weights.
+It is then split into atoms with small Lewis weights, and shows that randomly
+sampling a subset of these atoms gives the bound above.
+Our setup in Lemma~\ref{lem:talagrandL1} is equivalent to this
+situation after splitting.
+This means our result follows from the same proof as on page 367.
+This leads to a result as stated in Proposition $2$ with $n = d$,
+$K(X) = O(\sqrt{\log{d}})$
+and $C \frac{\epsilon^2}{\log d}$.
+\end{proof}
+
+
+The following was shown in~\cite{TalagrandLp}
+\begin{lemma}[\cite{TalagrandLp}]
+For any $p < 2$, there exists a constant $C$ such that if every row of $\AA$ has
+Lewis weight at most
+$C \frac{\epsilon^2}{\log (n) (\log (\log n / \epsilon))^2}$, we have
+\begin{equation*}
+\expec{\sigma}{\max_{\norm{\AA \xx}_p = 1}
+\left | \sum_i \sigma_i \left|\aa_i^T \xx \right|^p \right|} \leq \epsilon.
+\end{equation*}
+\end{lemma}
+
+\begin{proof}
+This was proven in Proposition 2.3 in~\cite{TalagrandLp}.
+It gives a bound of the form
+\begin{equation*}
+\Lambda_{F} \leq K \sqrt{ \frac{n}{M} \log{M} } \left( \log\log{M} + \log \left( \frac{M}{n} \right) \right).
+\end{equation*}
+where $\Lambda{F}$ was defined in Proposition 2.2 as
+\begin{equation*}
+\Lambda_{F} 
+= \expct{\sigma} {\max_{\xx \in F_1, \norm{\xx}_p \leq 1}
+\left | \sum_i \lambda_i \sigma_i \left| \xx(i) \right|^p \right|}.
+\end{equation*}
+Here $\lambda_i$ is $\wwbar_i / d$ where $\wwbar_i$ are the Lewis weights as defined in this paper, and $x(i)$
+has been normalized (divided by $\lambda_i^{1/p}$).
+
+Talagrand's $n$ is our $d$ and Talagrand's $M$ is our $n$.
+However, Talagrand's proof is only using the $\frac{n}{M}$ as an upper bound on the Lewis weights;
+thus, we can get our claim.  With a Lewis weight (by our definition) upper bound of $U$, expressions such as
+$\sqrt{\frac{n \log M}{M}}$ can be replaced with $\sqrt{U \log M}$, and $\frac{1}{M \log^4 M}$ with
+$\frac{U}{n \log^4 M}$.
+\end{proof}
+\cite{TalagrandLp} conjectures, immediately after its core claim Theorem 1.1,
+that the extra $\log \log n$ factors are unnecessary for this result
+(it describes them as ``truly parasitic'').  It also points out the difficulty of adapting its approach to remove them.
+
+We will give a general (for $p \leq 2$) reduction, Lemma~\ref{lem:momentreduct}, of these moment bounds to moment bounds on the error of our described sampling procedure.
+
+%The statement for the first entry is proven in Section~\ref{sec:concentration},
+%using $l = \log d$.  The second is from \cite{Talagrand90} (note the difference
+%between these two similar results: the first worsens the $\log d$ to
+%$\log(d / \epsilon)$, but achieves high probability rather than constant).  The
+%third comes from \cite{TalagrandLp}.  Both of these use $l = 1$: that is, they simply
+%bound an expectation.
+
+Now we may give the general reduction.  We describe a version with an extra
+restriction that the required Lewis weight bound is larger than $O(1/d)$;
+this is not actually necessary (and we will sketch how to avoid this).
+\begin{restatable}{lemma}{momentreduct}
+\label{lem:momentreduct}
+There exist constants $C_1$, $C_2$ such that for any $p < 2$, if a uniform bound of $\frac{1}{g(p, n, d, \epsilon, \delta)} = \Omega(1/d)$ on
+Lewis weights implies
+\begin{equation*}
+\expec{\sigma}{\left (\max_{\norm{\AA \xx}_p = 1} \left | \sum_i \sigma_i |\aa_i^T \xx_i|^p \right | \right )^l} \leq \epsilon^l \delta,
+\end{equation*}
+then sampling as described in Theorem~\ref{thm:ellpsample} with $\pp_i \geq g(p, N + C_1 d^2, d, \epsilon / C_2, \delta) \wwbar_i$ will satisfy
+\begin{equation*}
+\expec{\SS}{\left ( \max_{\norm{\AA \xx}_p = 1} | \norm{\SS \AA \xx}_p^p - 1 | \right )^l} \leq \epsilon^l \delta
+\end{equation*}
+and in particular, $\norm{\SS \AA \xx}_p \approx_{1 + \epsilon} \norm{\AA \xx}_p$ with probability at least $1-\delta$.
+\end{restatable}
+This is proved in Appendix~\ref{sec:reduct}.
+
+The following was shown in~\cite{BourgainLM89}
+\begin{lemma}[\cite{BourgainLM89}]
+For any $p > 2$, there exists a constant $C$ such that if
+if we sample $O(d^{p / 2} \log d \log(1 / \epsilon) / \epsilon^5)$ rows
+with probability proportional to Lewis weights to give $\AA'$, we have
+\begin{equation*}
+\max_{\norm{\AA \xx}_p = 1}
+\left | \norm{\AA' \xx}_p^p - 1 \right |  \leq \epsilon
+\end{equation*}
+with high probability.
+\end{lemma}
+
+\begin{proof}
+This is implicitly shown in the proof of Theorem 7.3 in~\cite{BourgainLM89}.  In particular, line
+7.27 is giving sufficient conditions for a Bernstein inequality, applied to random samples,
+to imply approximation.  These samples are chosen according to the probability measure $\nu$
+used in the paper, which is proportional to the Lewis weights.  We are only assuming the weights
+are lower bounds for the sampling probabilities, but increasing the probabilities further can
+only improve the condition of 7.27.
+\end{proof}
+
+There are several additional proofs of results similar to those we refer to here, including in Chapter 15 of
+\cite{LedouxTBook} and in \cite{GuedonR07}.

@@ -1,0 +1,154 @@
+\section{Optimization Perspective on Lewis Weights}
+\label{sec:convex}
+
+Although simple and appealing, the iterative scheme described fails
+when $p \geq 4$, since $\textsc{LewisIterate}$ stops being a contraction (further,
+runtime approaches infinity as $p \to 4$).  To obtain Lewis weights for general
+$p$, we therefore need another approach.  Here, we will give a characterization of
+Lewis weights based on the solution to an optimization problem.
+
+This optimization problem is essentially derived from a standard
+proof of the existence of Lewis weights (\cite{BanachBook}, III.B, 7).  In fact,
+it is interesting to note that both of these algorithms correspond fairly
+directly to proofs of the existence and uniqueness of Lewis weights.
+The optimization argument given here is valid for
+all $p$, but only directly leads to an efficient algorithm for $p \geq 2$
+(this is unimportant, since the iterative scheme is extremely efficient
+when $p < 2$).
+
+The optimization problem we will look at is, over symmetric matrices $\MM$,
+\begin{equation*}
+\begin{aligned}
+& \underset{\MM}{\text{maximize}} & & \det M \\
+& \text{subject to}
+& & \sum_i (\aa_i^T \MM \aa_i)^{p/2} \leq d, \\
+&&& \MM \succeq 0.
+\end{aligned}
+\end{equation*}
+
+Note that when $p \geq 2$, the region in question is convex: it is the intersection
+of the (convex) positive semidefinite cone and and $\ell_{p/2}$-norm constraint on
+a vector of linear functions of $\MM$ (the $\aa_i^T \MM \aa_i$).  Maximizing the
+determinant is also equivalent to minimizing the convex function $-\log \det \MM$,
+so it is a convex optimization problem (we will give a specific algorithm using
+convex optimization tools to find approximate Lewis weights below, in Theorem~\ref{thm:polyslow}.
+
+\begin{lemma}
+The optimization problem given above attains its maximum.
+Further, for any matrix $\QQ$ reaching this maximum, the weights
+\begin{equation*}
+\ww_i = (\aa_i^T \QQ \aa_i)^{p/2}
+\end{equation*}
+satisfy the definition (Definition~\ref{def:lewis}) of Lewis weights.
+\end{lemma}
+\begin{proof}
+First, note that the region in question is compact.  Since the function to be
+optimized is continuous, it must attain a maximum.
+
+Now, consider any matrix $\QQ$ that attains the maximum.
+Then $\QQ$ will saturate the $\sum_i (a_i^T \MM a_i)^{p/2}$ constraint since otherwise
+it could just be scaled up, but will be positive definite (not on the boundary of
+the semidefinite cone) because otherwise it would have determinant 0.  We may then
+say that $\QQ$ is a local maximum of the determinant subject to the constraint that
+\begin{equation*}
+\sum_i (\aa_i^T \MM \aa_i)^{p/2} = d.
+\end{equation*}
+Since all the functions in question are smooth, we may characterize such a local optimum
+by Lagrange multipliers.  The gradient of the constraint (note that we are in the vector
+space of symmetric matrices, so this is a matrix) at $\QQ$ can be seen to be
+\begin{equation*}
+p/2 \sum_i (\aa_i^T \QQ \aa_i)^{p/2 - 1} \aa_i \aa_i^T.
+\end{equation*}
+The gradient of the determinant, on the other hand, at $\QQ$, is $\det(\QQ) \QQ^{-1}$.
+Lagrange multipliers then imply that at $\QQ$, $\QQ^{-1}$ must be parallel to
+$\sum_i (\aa_i^T \QQ \aa_i)^{p/2 - 1} \aa_i \aa_i^T$.
+
+The claim is that
+\begin{equation*}
+\ww_i = (\aa_i^T \QQ \aa_i)^{p/2}.
+\end{equation*}
+then must satisfy the conditions for Lewis weights.  To argue this, we note that
+for these $\ww_i$, $\AA \WW^{1 - 2/p} \AA$ is
+\begin{equation*}
+\sum_i \ww_i^{1-2/p} \aa_i \aa_i^T = \sum_i (\aa_i^T \QQ \aa_i)^{p/2 - 1} \aa_i \aa_i^T.
+\end{equation*}
+In other words, $\AA \WW^{1 - 2/p} \AA$ is equal to $C \QQ^{-1}$ for some scalar $C$.
+That implies that the $\ww_i$ could be defined as
+\begin{equation*}
+C^{p/2} (\aa_i^T (\AA \WW^{1 - 2/p} \AA)^{-1} \aa_i)^{p/2}.
+\end{equation*}
+Then some scaling of the $\ww_i$ satisfies
+$\ww_i = (\aa_i^T (\AA \WW^{1 - 2/p} \AA)^{-1} \aa_i)^{p/2}$,
+so $\ww$ is a multiple of Lewis weights. But since
+\begin{equation*}
+\sum_i \ww_i = \sum_i (\aa_i^T \MM \aa_i)^{p/2} = d
+\end{equation*}
+$\ww_i$ defined this way must be precisely the Lewis weights.
+\end{proof}
+
+\begin{corollary}
+\label{cor:conlewis}
+For all $p$, there exists an assignment of weights satisfying Definition~\ref{def:lewis}.
+Furthermore, for $p \geq 2$, this assignment is unique.
+\end{corollary}
+\begin{proof}
+The existence statement just follows from taking any of the $\QQ$ attaining the maximum.
+For $p \geq 2$, the uniqueness follows from the fact that a strictly convex function
+(which $-\log \det \MM$ is) attains a unique minimum on a convex set, and that applying
+the argument in reverse every set of weights satisfying Definition~\ref{def:lewis}
+is induced by such a $\QQ$.
+\end{proof}
+Of course, as mentioned earlier, uniqueness for $p < 2$ follows from Corollary~\ref{cor:itlewis}.
+
+It is worth noting that this optimization problem gives a simple, geometric
+characterization of the Lewis weights.  $\sum_i (\aa_i^T \MM \aa_i)^{p/2}$
+is proportional to the average value of $\norm{\AA x}_p^p$ inside the ellipsoid
+$x^T \MM^{-1} x \leq 1$.  Thus, the quadratic form induced by the Lewis weights
+corresponds to the ellipsoid of maximum volume with a limited $p$-moment of
+$\norm{\AA x}_p$; it is a ``softer'' version of a John ellipsoid, where the max
+(effectively the $\infty$-moment) of $\norm{Ax}_p$ would be limited instead.
+
+To use this algorithmically, we only assume an approximate solution.
+We can analyze such a solution using the following lemma:
+\begin{lemma}
+There exists a constant $C$ such that for any $0 < \epsilon \leq 1$,
+and positive semidefinite matrix $\MM$ satisfying
+$\sum_i (\aa_i^T \MM \aa_i)^{p/2} = d$ and $\det \MM \geq (1-C \epsilon^2) \det \QQ$,
+$\MM \approx_{1+\epsilon} \QQ$.
+\end{lemma}
+\begin{proof}
+First note that $\QQ$ must be a maximum of
+$\trace{\MM \QQ^{-1}}$ within the feasible region (otherwise, there would be a
+direction in which the determinant increases around $\QQ$, making it not a local
+maximum).  But for any matrix $\MM$ with $\trace{\MM \QQ^{-1}} \leq d$, if
+$\MM \QQ^{-1}$ has any eigenvalues further than $\epsilon$ from 1,
+$\det(\MM^{-1}) \leq (1 - O(\epsilon^2)) \det(\QQ^{-1})$.  Therefore,
+an $O(\epsilon^2)$-approximate solution to the optimization problem implies
+an $\epsilon$-approximation of $\QQ$ and of the Lewis weights themselves.
+\end{proof}
+
+The algorithmic guarantee is then:
+\begin{theorem}
+\label{thm:polyslow}
+There exists a function $f(p, \epsilon)$ and a constant $C$ such that for any $\AA$, $p \geq 2$,
+$(1+\epsilon)$-approximate Lewis weights (or the quadratic form $\QQ$) can be computed in time $O(f(p, \epsilon) n \log(n) \log \log(n) d^C)$.
+\end{theorem}
+Note that the $p < 2$ case already follows from Lemma~\ref{lem:computeLewis}.
+\begin{proof}
+For any positive real number $D$, consider the intersection of the sets $\MM \succeq 0$,
+$\sum_i (\aa_i^T \MM \aa_i)^{p/2} \leq d$, and $\det(\MM) \geq D$.  This is a convex set
+with a polynomial time separation oracle.
+
+Furthermore, (if $D \leq \det \QQ$) this set always contains $\QQ$, which satisfies
+$\QQ \preceq n^{1-2/p} \AA^T \AA$ by the argument from Lemma~\ref{lem:initialization}
+(which nowhere assumes that $p < 4$) and is therefore contained in the ellipsoid
+(over matrices!) $\norm{\QQ (\AA^T \AA)^{-1}}_F^2 \leq n^{2-4/p} d$.  If $D$ is within a
+constant factor of $\det \QQ$, then the entire intersection is contained in a constant multiple
+of that ellipsoid, and the volume ratio between it and the ellipsoid is at most $n^{O(d^2)}$.
+Thus, for any such $D$, the ellipsoid algorithm can find an element in time $d^C \log n$ iterations,
+each of which will take $n d^C$ time.
+
+Finally, one may binary search (over an exponentially spaced set of possible $D$ values) to find
+such a $D$ within an appropriate constant factor $1+O(\epsilon^2)$ in $\log \log n + \log d$ iterations.
+\end{proof}
+This is a polynomial-time algorithm, but not an input-sparsity one.

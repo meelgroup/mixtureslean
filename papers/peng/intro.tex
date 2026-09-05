@@ -1,0 +1,162 @@
+%!TEX root = paper.tex
+
+\section{Introduction}
+\label{sec:intro}
+Randomized sampling is an important tool in the design of efficient algorithms.
+A random subset often preserves key properties of the entire data set,
+allowing one to run algorithms on a small sample.
+A particularly useful instance of this phenomenon is row sampling of matrices.
+For a $n \times d$ matrix $\AA$ where $n \gg d$ and any error parameter
+$\epsilon > 0$, we can find $\AA'$ with a few (rescaled) rows of $\AA$ such that
+\begin{equation*}
+\norm{\AA \xx}_{p} \approx_{1 + \epsilon} \norm{\AA' \xx}_{p}
+\end{equation*}
+for all vectors $\xx \in \Re^{d}$. Here $\approx_{1 + \epsilon}$
+denotes a multiplicative error between $(1 + \epsilon)^{-1}$ and $(1 + \epsilon)$.
+
+Originally studied in statistics~\cite{Talagrand90,RudelsonV07,Tropp12},
+the row sampling problem has received much attention recently in randomized numerical linear
+algebra~\cite{DrineasMM06,DrineasMMW11,ClarksonW13,MahoneyM13,NelsonN12,LiMP13,CohenLMMPS14:arxiv}
+and in graph algorithms as spectral sparsification~\cite{SpielmanS08:journal,BatsonSS12,KoutisLP12}.
+These works led to a good understanding of row sampling for the $p = 2$ case.
+If the rows of $\AA$ are sampled with probabilities proportional to their
+statistical leverage scores, matrix Chernoff bounds~\cite{AhlswedeW02,RudelsonV07,Tropp12}
+state that $\AA'$ with $O(d \log{d} / \epsilon^{-2})$ is a good approximation with high probability. 
+Recently, Clarkson and Woodruff developed oblivious subspace embeddings
+that brought the runtime of these algorithms down to input-sparsity time~\cite{ClarksonW13}.
+A derandomized procedure by Batson et al.~\cite{BatsonSS12} can also
+reduce the number of rows in $\AA'$ to $O(d / \epsilon^2)$, at the cost of a worse,
+but still polynomial, runtime.
+
+Substantial progress has also been made for other values of $p$~\cite{DasguptaDHKM09,SohlerW11,ClarksonDMMMW13,MahoneyM13},
+leading to input-sparsity time algorithms that return samples
+with about $d^{2.5}$ rows when $1 \leq p \leq 2$.
+The $p = 1$ case is of particular interest due to its relation
+to robust regression, or $\ell_1$-regression~\cite{Candes06}.
+In this setting, the existence of samples of size $O(d \log{d})$ was
+shown by Talagrand~\cite{Talagrand90} using Banach space theory.
+
+Talagrand's result, and the best known sampling results for general
+$\ell_p$ norms~\cite{BourgainLM89,TalagrandLp}, are based on a
+``change of density'' construction originally due to Lewis~\cite{lewis}. This construction
+assigns a weight, analogous to a leverage score, to each row; these can be used
+directly as sampling probabilities.  We will refer to these weights as ``Lewis weights''.
+Given their direct use as sampling probabilities, the primary algorithmic challenge
+is to be able to compute, or at least approximate, these weights.  This paper provides
+the first input-sparsity time algorithms, and in fact the first polynomial time algorithms,
+for this problem.  That in turn leads to the first polynomial time algorithmic versions
+of the Talagrand and other Lewis weight-based results.
+
+In particular, we give a simple iterative algorithm that approximates Lewis weights
+through repeated computations of statistical leverage scores.
+Sampling by these approximate weights then leads to the following result:
+
+\begin{theorem}
+\label{thm:main}
+Given a matrix $\AA$ and any error parameter $\epsilon > 0$,
+there is a distribution of matrices $\SS$ with $O(d \log d \epsilon^{-2})$
+rows and one nonzero entry per row such that with high probability
+\begin{equation*}
+\norm{\SS \AA \xx}_1 \approx_{1 + \epsilon} \norm{\AA \xx}_1
+\qquad \text{for all } \xx \in \Re_{d}.
+\end{equation*}
+Furthermore, we can sample from this distribution using $O(\log \log{n})$ calls
+to computing 2-approximate statistical leverage scores of matrices of the
+form $\WW \AA$ where $\WW$ is a non-negative diagonal matrix.
+\end{theorem}
+This routine can be combined with any algorithm for computing (approximate) statistical leverage scores.
+By invoking input-sparsity time routines~\cite{ClarksonW13,MahoneyM13,
+NelsonN12,LiMP13,CohenLMMPS14:arxiv} and approximating intermediate
+objects to a coarser granularity, we obtain algorithms that compute $\AA'$ with
+$O(d \log{d} \epsilon^{-2})$ rows in $O(\nnz(\AA) + d^{\omega + \theta} )$ time.
+Here $\omega$ is the matrix-multiplication exponent and $\theta > 0$ is any constant.
+This is a substantial improvement over previous results.
+The previous best algorithm with a comparable running time gives a sample size of
+about $d^{3.66}$~\cite{LiMP13}; algorithms for obtaining samples with
+$O(d^{2.5})$ rows rely on an expensive ellipsoidal rounding algorithm~\cite{DasguptaDHKM09},
+and therefore have prohibitively large $\poly(d)$ terms.
+
+We also give input-sparsity time algorithms for sampling for general $\ell_p$ norms.
+However, the sample count is slightly higher for $p \in (1,2)$ and substantially higher
+(around $d^{p/2}$) for $p > 2$.  Furthermore, the runtime gets substantially worse as
+$p$ approaches and exceeds 4 (we  use the ellipsoid algorithm in this regime).
+Nonetheless, these algorithms do much better than previous ones: they give a near-optimal
+sample count, and their dependence on $d$ (though high) is of the form
+$d^{p/2 (1 + \theta) + C}$
+(better than could be obtained in approaches based on resparsifying the
+outputs of existing algorithms).
+
+A table summarizing our main algorithmic results is in Figure~\ref{fig:summary}.
+The bounds omit logarithmic factors in the runtime, $d^{\theta}$ tradeoffs
+with input sparsity terms, success probabilities, and $\epsilon$
+and constant factor $p$ dependences.
+All of these algorithms can be run with an $\nnz(\AA) \log n$ term and also
+support a tradeoff to get pure input sparsity time.
+
+
+\begin{figure}
+
+\begin{center}
+
+\begin{tabular}{| l | l | l | l | }
+\hline
+$p$ & polynomial runtime term & Sample count & Relevant Sections\\ \hline
+$p = 1$ & $d^{\omega}$ & $d \log d$ &
+Sections~\ref{sec:overview},~\ref{sec:compute},~\ref{sec:ellp},~and~\ref{sec:concentration}\\ \hline
+$1 < p < 2$ & $d^{\omega}$ & $d \log d \log \log^2 d$ & Sections~\ref{sec:overview},~\ref{sec:compute}, and~\ref{sec:ellp}\\ \hline
+$2 < p < 4$ & $d^{\omega}$ & $d^{p/2} \log d$ &
+Sections~\ref{sec:overview},~\ref{sec:compute},~and~\ref{sec:ellp}\\ \hline
+$2 \leq p $ & $d^{p/2+C}$ & $d^{p/2} \log d$ &
+Sections~\ref{sec:overview},~\ref{sec:convex},~\ref{sec:sparseconvex}~and~\ref{sec:ellp}\\ \hline
+\end{tabular}
+
+\end{center}
+
+\caption{Summary of Our Algorithmic Results}
+\label{fig:summary}
+\end{figure}
+
+
+In Section~\ref{sec:ellp}, we briefly go over known statistical results~\cite{Talagrand90,
+TalagrandLp,BourgainLM89} on the concentration of sampling by Lewis weights.
+One issue with invoking these results is that the bounds in them do not explicitly
+describe non-uniform sampling based on upper bounds of Lewis weights.
+Instead, the more common form of a main theorem in these results is that
+if the Lewis weights are uniformly small, uniformly sampling half the rows gives
+a good approximation.
+We use standard techniques (which we describe in more detail in
+Appendix~\ref{sec:reduct}) to show that the latter implies the former.
+
+Additionally, in the case of $\ell_1$, we give an alternate, elementary proof
+of the concentration of the sampling process in Section~\ref{sec:concentration}.
+It simplifies many components of previous
+proofs~\cite{Talagrand90,Pisier99:book} while following the same basic strategy.
+The bound is slightly weaker in some artificial parameter ranges, but is also stronger
+in giving much sharper tails.  It is arguably even simpler than proofs of $\ell_2$ matrix Chernoff
+bounds~\cite{Vershynin09,Harvey11}.  Unfortunately, the picture for general $\ell_p$ seems
+to be much more difficult: published proofs for $p \not \in \{ 1, 2 \}$ use deep results from
+Gaussian processes.  We consider it an open problem to find elementary proofs for these ranges.
+
+Our results significantly improve algorithms for the well studied
+$\ell_p$, and specifically $\ell_1$, row sampling problem.
+We also give a version of $\ell_1$ matrix concentration bound that's
+analogous to the widely-used $\ell_2$ matrix concentration bounds.
+We believe these results and the simplicity of our techniques
+show the usefulness of Lewis weights as an algorithmic tool
+for randomized numerical linear algebra in $p$-norms.
+
+The paper is structured as follows: in Section~\ref{sec:overview} we formalize
+the matrix row sampling problem and give an overview of our result.
+Our simple iterative algorithm for computing approximate Lewis weights is in Section~\ref{sec:compute};
+this applies to all $p < 4$.
+An alternative approach to computing Lewis weights based on convex optimization, valid for all $p \geq 2$,
+is in Section~\ref{sec:convex}.
+Section~\ref{sec:properties} gives properties of Lewis weights useful in some of our arguments.
+An input-sparsity time algorithm using the convex optimization approach is in Section~\ref{sec:sparseconvex}.
+Section~\ref{sec:ellp} summarizes the known sampling results for each range of $p$, and describes
+a way to take existing proofs and obtain analyses of our simple sampling procedure.
+Section~\ref{sec:concentration} gives most of our elementary proof of the validity
+of $\ell_1$ sampling by Lewis weight.
+Finally, Appendix~\ref{sec:properties-proofs} proves the properties from Section~\ref{sec:properties},
+and Appendix~\ref{sec:reduct} gives the proof of the reduction from our sampling procedure
+given in Section~\ref{sec:ellp}.

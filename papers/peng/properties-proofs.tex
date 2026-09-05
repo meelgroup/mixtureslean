@@ -1,0 +1,214 @@
+%!TEX root = paper.tex
+
+\section{Properties of Lewis weights - proofs}
+\label{sec:properties-proofs}
+This appendix contains proofs of the properties stated in Section~\ref{sec:properties}.
+
+\begin{lemma}
+\label{lem:equivstable}
+Parts \ref{def:stable1} and \ref{def:stable2} of Definition~\ref{def:stable} are equivalent.
+\end{lemma}
+\begin{proof}
+Given $\alpha$-almost Lewis weights $\ww$, define the errors $\ee$ as
+\begin{equation*}
+\ee_i = \aa_i^T \left( \AA^T \WW^{1 - 2/p} \AA \right)^{-1} \aa_i \ww_i^{-2/p}.
+\end{equation*}
+Then define $\AA'$ as $\EE^{1/p-1/2} \AA$ and $\BB'$ as $\WW^{1/2-1/p} \AA$. $\AA'$ has
+Lewis weights $\ee_i \ww_i$, which reweight it to $\BB'$.  $\AA$,
+when reweighted by the true weights $\wwbar$, will give $\BB = \WWbar^{1-2/p} \AA$.
+$\AA$ is within a factor of $\alpha^{|1/2-1/p|}$ of $\AA'$; part \ref{def:stable1} then would imply
+that $\BB$ is within a $\alpha^{c |1/2-1/p|}$ factor of $\BB$ and equivalently that
+\begin{equation*}
+\wwbar_i \approx_{\alpha^c} \ww_i
+\end{equation*}
+giving \ref{def:stable2}.
+This argument works in reverse as well (interpreting the Lewis weights for any $\AA'$ as scaled
+approximate Lewis weights for $\AA$), so $c$-stability is equivalent to the statement that
+$\alpha$-almost Lewis weights are always within $\alpha^c$ of the true Lewis weights.  Note
+that this implies that $(1+O(1/c))$-almost Lewis weights are within $O(1)$ of the true Lewis
+weights.
+\end{proof}
+
+Now, we prove all the results from Section~\ref{sec:properties}.
+\begin{proof}[Proof of Lemma~\ref{lem:fullstable}]
+Here, we prove the $\alpha$-almost weight notion of stability, part~\ref{def:stable1} of Definition~\ref{def:stable}.
+First, note that for $\alpha$-almost Lewis weights $\ww$,
+\begin{equation*}
+\textsc{LewisIterate}(\AA, p, 1, \ww) \approx_{\alpha^{p/2}} \ww.
+\end{equation*}
+
+In other words, the first step can only change the weights by a power of $p/2$.
+But then since $\textsc{LewisIterate}$ is a contraction mapping by $|p/2 - 1|$,
+the $t$\textsuperscript{th} step after this, when iterating, can change by only $\alpha^{p/2 |p/2 - 1|^t}$.
+The iteration will converge to $\wwbar$, while changing by a total of at most
+\begin{equation*}
+\alpha^{p/2 \sum_{t=0}^\infty |p/2 - 1|^t} = \alpha^{\frac{p/2}{1 - |p/2 - 1|}}.
+\end{equation*}
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:sqrtstable}]
+Here, we will find it more convenient to use the definition of stability in terms of a reweighted matrix,
+part~\ref{def:stable2} of Definition~\ref{def:stable}.
+
+We bound the stability by bounding it infinitesimally.  We let $\rr_i$ and $\ss_i$ be factors that can be
+multiplied by the weights of the row, constrained so that $\SS \AA$, when multiplied by
+$\WWbar^{1/2-1/p}$ for its Lewis weights $\WWbar$, gives $\RR \AA$.  We will bound the derivative
+of $\rr$ with respect to $\ss$.  For any direction vector $\Delta(\ss)$, let the derivative
+in that direction by $\Delta(\rr)$.  Then the stability claim is that the max of $\frac{\Delta(\ss)_i}{\ss_i}$
+is at most $c$ times the max of $\frac{\Delta(\rr)_i}{\rr_i}$.
+
+It is not apparent how to bound this directly.  However, note that saying that the derivative of $\rr$ with
+respect to $\ss$ in the direction of $\Delta(\ss)$ equals $\Delta(\rr)$ is equivalent to saying that the derivative of $\ss$ with
+respect to $\rr$ in the direction of $\Delta(\rr)$ equals $\Delta(\ss)$.  Thus, what we want is to show that
+that the ratio can't \emph{decrease} too much when differentiating with respect to $\rr$.
+
+For convenience, we will assume that $\AA^T \RR^2 \AA = \II$ (by a change of basis)
+and $\norm{\aa_i}^2 = 1$ (by rescaling the rows of $\AA$ simultaneously with $\RR$).
+
+The $\ss$ in terms of the $\rr$ are
+\begin{equation*}
+\ss_i = \rr_i^{2/p} (\aa_i^T (\AA^T \RR^2 \AA)^{-1} \aa_i)^{1/p - 1/2}.
+\end{equation*}
+
+The initial $\ss_i$ are just $\rr_i^{2/p}$.
+
+Then given that $\norm{\aa_i}^2 = 1$ and $\AA^T \AA = \II$, the partial derivative of $\ss_i$ with respect to $\rr_j$ is
+\begin{equation*}
+\rr_i^{2/p-1} ( (1-2/p) \rr_i \rr_j (\aa_i^T \aa_j)^2 + 2/p \delta_{i,j} ).
+\end{equation*}
+
+We may define the symmetric matrix $\MM_{i,j} = ( (1-2/p) \rr_i \rr_j (\aa_i^T \aa_j)^2 + 2/p \delta_{i,j} )$.  Then the partial derivatives gives us
+\begin{equation*}
+\Delta(\ss) = \RR^{2/p-1} \MM \Delta(\rr).
+\end{equation*}
+
+The matrix of $\rr_i \rr_j \rr_j (\aa_i^T \aa_j)^2$ is positive semidefinite--we can write it as $\CC^T \CC$,
+where the rows of $\CC$ are scaled tensor squared rows of $\AA$: $\cc_i = \rr_i (\aa_i \otimes \aa_i)$.
+Thus, $\MM \succeq 2/p \II$, or equivalently, all eigenvalues of $\MM$ are at least $\frac{2}{p}$.
+Thus,
+\begin{equation*}
+\norm{\MM \Delta(\rr)}_2 \geq \frac{2}{p} \norm{\Delta(\rr)}_2.
+\end{equation*}
+
+In other words,
+\begin{equation*}
+\norm{\RR^{1-2/p} \Delta(\ss)}_2 \geq \frac{2}{p} \norm{\Delta(\rr)}_2.
+\end{equation*}
+
+The elements of $\RR^{1-2/p} \Delta(\ss)$ are $\rr_i \frac{\Delta(\ss)_i}{\rr_i^{2/p}}$
+$\rr_i \frac{\Delta(\ss)_i}{\ss_i}$.  Finally, since $\sum_i \rr_i^2 = d$,
+\begin{equation*}
+\norm{\RR^{1-2/p} \Delta(\ss)}_2 \leq \sqrt{d} \max_i \frac{\Delta(\ss)_i}{\ss_i},
+\end{equation*}
+so that
+\begin{equation}
+\label{eqn:bigl2}
+\max_i \frac{\Delta(\ss)_i}{\ss_i} \geq \frac{2}{p \sqrt{d}} \norm{\Delta(\rr)}_2.
+\end{equation}
+
+However, we still need to address the possibility that $\norm{\Delta(\rr)}_2$ is much smaller
+than $\max_i \frac{\Delta(\rr)_i}{\rr_i}$.  To do this, consider the $i$ that maximizes that
+ratio (and assume by scaling that the ratio is 1).  Then, for that particular $i$,
+\begin{equation*}
+\frac{\Delta(\ss)_i}{\ss_i} = \frac{2}{p} - (1-2/p) \sum_j \rr_j^2 (\aa_i^T \aa_j)^2 \left ( \frac{\Delta(\rr)_j}{\rr_j} \right ).
+\end{equation*}
+Note that we can also express $\norm{\Delta(\rr)}_2^2$ as
+\begin{equation*}
+\sum_j \rr_j^2 \left ( \frac{\Delta(\rr)_j}{\rr_j} \right )^2.
+\end{equation*}
+Now, $0 \leq \rr_j^2 (\aa_i^T \aa_j)^2 \leq \rr_j^2$, while $\sum_j \rr_j^2 (\aa_i^T \aa_j)^2 = 1$
+(since $\AA^T \RR^2 \AA = \II$), so
+$\sum_j \rr_j^2 (\aa_i^T \aa_j)^2 \left ( \frac{\Delta(\rr)_j}{\rr_j} \right )$ is at most the average
+of $\left ( \frac{\Delta(\rr)_j}{\rr_j} \right )$ in the largest mass-1 set of $j$s.  Thus
+it is at most $\norm{\Delta(\rr)}_2$ (since weighted $\ell_2$ norms dominate $\ell_1$ norms when the total
+mass sums to 1).
+Plugging that in we get
+\begin{equation}
+\label{eqn:smalll2}
+\max_i \frac{\Delta(\ss)_i}{\ss_i} \geq 2/p - (1-2/p) \norm{\Delta(\rr)}_2.
+\end{equation}
+
+With $\max_i \frac{\Delta(\rr)_i}{\rr_i} = 1$, we have both
+Equation~\ref{eqn:bigl2} and Equation~\ref{eqn:smalll2}.
+The former is increasing in $\norm{\Delta(\rr)}_2$ and the latter decreasing,
+so the worst case for the minimum of the two of these is when they are equal,
+which occurs at $\norm{\Delta(\rr)}_2 = \frac{\frac{2}{p}}{\frac{2}{p \sqrt{d}} + (1-2/p)}$.
+This bound is
+\begin{align*}
+\max_i \frac{\Delta(\ss)_i}{\ss_i} &\geq \frac{\frac{4}{p^2 \sqrt{d}}}{\frac{2}{p \sqrt{d}} + (1-2/p)} \\
+&= \frac{4}{2p + (p^2-2p) \sqrt{d}} \\
+&= \Omega \left ( \frac{1}{\sqrt{d}} \right ).
+\end{align*}
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:fullmonotone}]
+Assume $p < 2$ (the case for $p=2$ follows from the fact
+that $\ell_2$ Lewis weights are just leverage scores).
+Let $r$ be the maximum ratio (over $i$) of $\wwbar'_i$ to $\wwbar_i$, which occurs at some row $i^*$.
+We want to show than $r \leq 1$; we will suppose that $r > 1$ and obtain a contradiction.
+
+Now, we have
+\begin{equation*}
+\AA'^T \WWbar'^{1-2/p} \AA' \succeq r^{1-2/p} \AA^T \WWbar^{1-p/2} \AA,
+\end{equation*}
+since each row of $\AA$ contributes at least $r^{1-2/p}$ as much to the left hand side as to the right.  But the
+$\wwbar'_i$ are equal to $(\aa_i^T (\AA'^T \WWbar'^{1-2/p} \AA')^{-1} \aa_i)^{p/2}$, and
+\begin{align*}
+(\aa_i^T (\AA'^T \WWbar'^{1-2/p} \AA')^{-1} \aa_i)^{p/2} &\leq r^{-p/2 (1-2/p)} (\aa_i^T (\AA^T \WWbar^{1-2/p} \AA)^{-1} \aa_i)^{p/2} \\
+&= r^{1-p/2} \wwbar_i
+\end{align*}
+Thus, in particular, no weight increases by more than $r^{1-p/2}$.  But with $p < 2$, if $r > 1$,
+$r^{1-p/2} < r$.  Thus,
+\begin{equation*}
+\wwbar'_{i^*} \leq r^{1-p/2} \wwbar_{i^*} < r \wwbar_{i^*}
+\end{equation*}
+This contradicts the fact that $r = \frac{\wwbar'_{i^*}}{\wwbar_{i^*}}$.
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:weakmonotone}]
+First, assume without loss of generality that $\AA^T \WWbar^{1 - 2/p} \AA$ is equal to the identity matrix.
+Then the claim is that all eigenvalues of $\AA'^T \WWbar'^{1 - 2/p} \AA'$ are at least $d^{2/p - 1}$.
+
+For convenience, define $\PP = \AA'^T \WWbar'^{1 - 2/p} \AA'$, and let $\uu$ be an eigenvector of
+$\PP$ of minimum eigenvalue, normalized so that $\norm{u}_2 = 1$.  Let $\lambda$ be the eigenvalue
+of $\uu$, $\uu^T \PP \uu$.  Then one may see by looking at an orthogonal eigenbasis that
+\begin{equation*}
+\PP^{-1} \succeq \lambda^{-1} \uu \uu^T.
+\end{equation*}
+
+We further define normalized rows $\vv_i = \ww_i^{-1/p} \aa_i$, so that $\AA^T \WWbar^{1 - 2/p} \AA$,
+the identity matrix, may be written as
+\begin{equation*}
+\sum_i \wwbar_i \vv_i \vv_i^T
+\end{equation*}
+with the $\vv_i$ each being unit vectors.  $\PP$ is lower bounded by its contributions from the original rows
+($\AA^T \WWbar'^{1-2/p} \AA$); expressing the latter in terms of the $\vv$ gives
+\begin{align*}
+\PP &\succeq \sum_i \wwbar_i \frac{(\wwbar'_i)^{1-2/p}}{\wwbar_i^{1-2/p}} \vv_i \vv_i^T \\
+&= \sum_i \wwbar_i (\vv^T \PP^{-1} \vv)^{p/2-1} \vv_i \vv_i^T.
+\end{align*}
+
+Since $\PP^{-1} \succeq \lambda^{-1} \uu \uu^T$ this further gives
+\begin{equation*}
+\PP \succeq \sum_i \ww_i \lambda^{1-p/2} (\uu^T \vv)^{p-2} \vv_i \vv_i^T.
+\end{equation*}
+What we have done is provide a lower bound for the quadratic form $\PP$ given that it has
+a small eigenvalue, using the fact that relative leverage scores cannot have decreased
+below the leverage scores of the restriction to the eigenspace.  This is not affected by
+any increases in the other eigenvalues,
+
+Plugging $\uu$ into the quadratic form implies
+\begin{equation*}
+\uu^T \PP \uu \geq \lambda^{1-p/2} \wwbar_i (\uu^T \vv)^p.
+\end{equation*}
+
+Now, the original quadratic form was the identity, so $\sum_i \ww_i = d$ and $\sum_i \wwbar_i (\uu^T \vv)^2 = 1$.
+By a weighted power-mean inequality, $\sum_i \wwbar_i (\uu^T \vv)^p \geq d^{1-p/2}$.
+
+Plugging in $\lambda = \uu^T \PP \uu$ finally gives
+\begin{align*}
+\lambda &\geq \lambda^{1-p/2} d^{1-p/2} \\
+\lambda^{p/2} &\geq d^{1-p/2} \\
+\lambda &\geq d^{2/p - 1}.
+\end{align*}
+\end{proof}

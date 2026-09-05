@@ -1,0 +1,16 @@
+%!TEX root = paper.tex
+
+
+
+\begin{abstract}
+We give a simple algorithm to efficiently sample the rows of a matrix while
+preserving the p-norms of its product with vectors.
+Given an $n$-by-$d$ matrix $\AA$, we find with high probability and in
+input sparsity time an $\AA'$ consisting of about $d \log{d}$ rescaled rows of
+$\AA$ such that $\norm{\AA \xx}_1$ is close to $\norm{\AA' \xx}_1$ for all vectors $\xx$.
+We also show similar results for all $\ell_p$ that give nearly optimal sample bounds 
+in input sparsity time.  Our results are based on sampling by ``Lewis weights'',
+which can be viewed as statistical leverage scores of a reweighted matrix.
+We also give an elementary proof of the guarantees of this sampling process for $\ell_1$.
+\end{abstract}
+

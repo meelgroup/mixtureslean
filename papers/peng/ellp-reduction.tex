@@ -1,0 +1,121 @@
+\section{Reduction to Uniform Weight Sampling}
+\label{sec:reduct}
+Here, we prove Lemma~\ref{lem:momentreduct}:
+
+\momentreduct*
+
+Before proving the general reduction, we first make a much weaker claim:
+\begin{lemma}
+\label{lem:weakbound}
+There exist constants $C_1$, $C_2$, $C_3$ such that for any $p < 2$, for any matrix $\AA$, there
+exists a matrix $\AA'$ with at most $C_1 d^2$ rows such that
+\begin{equation*}
+\AA'^T {\WWbar'}^{1-2/p} \AA' \succeq \AA^T \WWbar^{1-2/p} \AA
+\end{equation*}
+and for all $\xx$,
+\begin{equation*}
+\norm{\AA' \xx}_p^p \preceq C_2 \norm{\AA \xx}_p^p.
+\end{equation*}
+Furthermore the Lewis weight of each row of $\AA'$ is at most $\frac{C_3}{d}$.
+\end{lemma}
+Note that we are only requiring the \emph{existence} of such an approximation, and that it is of size $\theta(d^2)$.
+Also, we only will need this result to reduce the number of rows (and not the Lewis weight upper bound) subject to
+random splitting; arguments that do not depend on the number of rows, such as that in~\cite{Talagrand90}, can simply
+use split up versions of $\AA$.
+
+\begin{proof}
+Such an $\AA'$ simply obtained by sampling rows from $\AA$ proportional to Lewis weights, then scaling the result up
+by a constant; then, with appropriate setting of constants, both conditions will hold with high probability.
+The first condition follows from matrix Chernoff bounds plus Lemma~\ref{lem:fullstable}.  The second can be shown
+with a simple union bound argument over a net, and was first shown in \cite{Schechtman}, Proposition 4.
+\end{proof}
+
+Now, we prove the actual reduction.
+\begin{proof}[Proof of Lemma~\ref{lem:momentreduct}]
+The argument proceeds by a standard symmetrization argument, as is used, for example, in the $\ell_2$ case in
+\cite{RudelsonV07}.
+
+For convenience, we let
+\begin{equation*}
+U = g(p, N + C_1 d^2, d, \epsilon / C_2, \delta)
+\end{equation*}
+and
+\begin{equation*}
+M = \expec{\SS}{\left ( \max_{\norm{\AA \xx}_p = 1} | \norm{\SS \AA \xx}_p^p - 1 | \right )^l}.
+\end{equation*}
+
+First, consider the functional taking $l$th power of the maximum absolute value taken by a function
+(the expectation is of a quantity of this form).  This functional is convex, and
+$\norm{\SS \AA \xx}_p^p - 1$ has mean 0.  Then our expectation satisfies
+\begin{equation*}
+M \leq \expec{\SS,\SS'}{\left ( \max_{\norm{\AA \xx}_p = 1} | \norm{\SS \AA \xx}_p^p - \norm{\SS' \AA \xx}_p^p | \right )^l}
+\end{equation*}
+where $\SS$ and $\SS'$ are two independent copies of the sampling process--this holds because subtracting the second copy is
+adding a mean 0 random variable, which can only increase the expectation of any convex function.
+
+We refer to the indices of the specific rows chosen for $\SS$ as $i_k$ (with $i'_k$ for $\SS'$).
+
+We may explicitly write the inner expression here as a sum:
+\begin{equation*}
+\norm{\SS \AA \xx}_p^p - \norm{\SS' \AA \xx}_p^p = \left ( \sum_{k=1}^N \frac{|\aa_{i_k}^T \xx|^p}{\pp_{i_k}} \right ) - \left ( \sum_{k=1}^N \frac{|\aa_{i'_k}^T \xx|^p}{\pp_{i'_k}} \right ).
+\end{equation*}
+
+Since $i_k$ and $i'_k$ have identical distributions, we may independently randomly swap each of these pairs according to a random sign variable $\sigma_k$ without changing the distribution.
+This swap would cause the first row to be subtracted and the second added, rather than vice versa
+That random process is
+\begin{equation*}
+\left ( \sum_{k=1}^N \sigma_k \frac{|\aa_{i_k}^T \xx|^p}{\pp_{i_k}} \right ) - \left ( \sum_{k=1}^N \sigma_k \frac{|\aa_{i'_k}^T \xx|^p}{\pp_{i'_k}} \right ).
+\end{equation*}
+
+This is a sum of two (non-independent) copies of the same process: $\sum_{k=1}^N \sigma_k \frac{|\aa_{i_k}^T \xx|^p}{\pp_{i_k}}$.
+Having two copies can only multiply an $l$-moment by $2^l$.  Thus we have
+\begin{equation*}
+M \leq 2^l \expec{i, \sigma}{\left ( \max_{\norm{\AA \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k \frac{|\aa_{i_k}^T \xx|^p}{\pp_{i_k}} \right | \right )^l}.
+\end{equation*}
+
+Now, we may consider the expected value of this with the rows taken ($i_k$) fixed, varying the $\sigma_k$.
+
+First, we apply Lemma~\ref{lem:weakbound}, getting such an $\AA'$ with $C_1 d^2$ rows.  Now, we consider that
+adding an additional $\sigma_i | (\aa')_i^T \xx |^p$ term can only increase the energy.  We define $\AA''$ as
+$\SS \AA$ with the rows of $\AA$ appended.  The expected value is then at most
+\begin{equation*}
+\expec{\sigma}{\left ( \max_{\norm{\AA \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k |(\aa'')_k^T \xx|^T \right | \right )^l}.
+\end{equation*}
+Lemma~\ref{lem:fullmonotone} implies that the Lewis weight
+of each row of $\AA''$ from $\AA'$ is at most $\frac{C_3}{d}$ (since adding the other rows can't bring them down)
+while the quadratic ${\AA''}^T \WWbar'' \AA'' \succeq \AA^T \WWbar^{1-2/p} \AA$.  The latter implies that the
+Lewis weight of each row from $\AA$ is at most $\frac{1}{U}$ (since it is weighted to have
+$(\yy^T (\AA^T \WWbar^{1-2/p} \AA)^{-1} \yy)^{p/2} = \frac{1}{U})$.  Thus, assuming that the Lewis weight
+ upper bounds are larger than $O(1/d)$, each of these has a Lewis weight of at most $\frac{1}{U}$,
+as will be needed. To modify the proof to remove the need for this assumption, one can add potentially
+multiple, downscaled copies of $\AA'$ depending on the bound on the remaining rows.
+
+For a particular set of rows taken defining a matrix $\SS$, we let
+\begin{equation*}
+F = \max_{\norm{\AA \xx}_p = 1} | \norm{\SS \AA \xx}_p^p - 1 |.
+\end{equation*}
+
+Then for the corresponding matrix $\AA''$, we have, for all $\xx$
+\begin{equation*}
+\norm{\AA'' \xx}_p^p \leq (1+C+F) \norm{\AA \xx}_p^p.
+\end{equation*}
+
+This means that
+\begin{equation*}
+\max_{\norm{\AA \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k |(\aa'')_k^T \xx|^T \right |
+\leq (1+C+F) \max_{\norm{\AA'' \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k |(\aa'')_k^T \xx|^T \right |
+\end{equation*}
+so that, applying the given moment bound on the random sign process,
+\begin{align*}
+\expec{\sigma}{\left ( \max_{\norm{\AA \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k |(\aa'')_k^T \xx|^T \right | \right )^l} &\leq (1+C+F)^l \expec{\sigma}{\left ( \max_{\norm{\AA'' \xx}_1 = 1} \left | \sum_{k=1}^N \sigma_k |(\aa'')_k^T \xx|^T \right | \right )^l} \\
+&\leq (1+C+F)^l \epsilon^l \delta.
+\end{align*}
+
+$(1+C+F)^l \leq 2^{l-1} ((1+C)^l + F^l)$.  By definition, the expected value of $F^l$ under a random choice of $\SS$ is precisely $M$, the moment we are trying to bound.  We thus have
+\begin{align*}
+M &\leq 2^{2l-1} ((1+C)^l + M) \epsilon^l \delta \\
+M &\leq \frac{2^{2l-1} (1+C)^l \epsilon^l \delta}{1 - 2^{2l-1} \epsilon^l \delta}.
+\end{align*}
+
+Then for some $\epsilon = O(1)$, the denominator is at least $\frac{1}{2}$, and $M \leq ((4+4C) \epsilon)^l \delta$.  Thus for sufficiently small $\epsilon$, obtaining the result for the random sign process with $\frac{\epsilon}{4+4C}$ gives what is needed.
+\end{proof}
